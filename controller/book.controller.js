@@ -49,6 +49,21 @@ export const add = async (req, res) => {
 
 export const bookList = async (req, res) => {
   try {
+    const {search}=req.query;
+   
+    if(search && search.trim())
+    {
+      const searchResults = await prisma.book.findMany({
+        where: {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      });
+
+      return res.status(200).json({ AllBook: searchResults });
+    }
     const bookList = await prisma.book.findMany({
       include: {
         user: {
