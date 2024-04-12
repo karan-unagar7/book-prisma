@@ -23,7 +23,5 @@ export const fileUpload = async (localfilepath) => {
 };
 
 export const fileDestroy = async (localfilepath) => {
-  return await cloudinary.uploader.destroy(localfilepath, {
-    resource_type: "auto",
-  });
+  return await cloudinary.uploader.destroy(localfilepath);
 };

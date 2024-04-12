@@ -21,6 +21,7 @@ model User {
   gender    Gender
   interest  String[] @default([])
   profilePic     String?
+  publicUrl     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   books     Book[]
@@ -40,7 +41,7 @@ model Book {
   category      String
   price         Float
   released_year Int
-  status        Boolean @default(false)
+  status        Boolean @default(true)
   createdAt     DateTime @default(now())
   userId        Int
   user          User     @relation(fields: [userId], references: [id],onDelete: Cascade)

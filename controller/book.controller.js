@@ -16,8 +16,6 @@ export const add = async (req, res) => {
       released_year,
     } = req.body;
 
-    
-
     if (
       (name ||
         description ||
@@ -31,28 +29,62 @@ export const add = async (req, res) => {
         .status(400)
         .json({ success: false, message: error.allFieldRequired });
     }
-    await prisma.book.create({data:{
-      name,
-      description,
-      no_of_page:parseInt(no_of_page),
-      author,
-      category,
-      price:parseFloat(price),
-      released_year:parseInt(released_year),
-      userId: id,
-    }});
+    await prisma.book.create({
+      data: {
+        name,
+        description,
+        no_of_page: parseInt(no_of_page),
+        author,
+        category,
+        price: parseFloat(price),
+        released_year: parseInt(released_year),
+        userId: id,
+      },
+    });
     return res.status(201).json({ success: true, message: book.newBookCreate });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
 
-export const getAll = async (req, res) => {
+export const bookList = async (req, res) => {
+  try {
+    const bookList = await prisma.book.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!bookList) {
+      return res.status(404).json({ message: book.bookNotFound });
+    }
+    return res.status(200).json({ AllBook: bookList });
+  } catch (error) {
+    return res.status(200).json({ AllBook: bookList });
+  }
+};
+
+export const getUserAllBook = async (req, res) => {
   try {
     const { id } = req.user;
     const bookList = await prisma.book.findMany({
       where: {
         userId: id,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 
@@ -65,7 +97,7 @@ export const getAll = async (req, res) => {
   }
 };
 
-export const getOne = async (req, res) => {
+export const getUserOneBook = async (req, res) => {
   try {
     const { id } = req.user;
     const _id = Number(req.params.id);

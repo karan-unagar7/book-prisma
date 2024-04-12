@@ -4,13 +4,13 @@ import { generateToken } from "../utility/token.js";
 import bcrypt from "bcryptjs";
 import { sendEmail } from "../utility/mail.js";
 import { EMAIL } from "../config/config.js";
-import { fileUpload } from "../utility/cloudinary.js";
+import { fileUpload, fileDestroy } from "../utility/cloudinary.js";
 
 const { user, error } = message;
 
 export const signUp = async (req, res) => {
   try {
-    const { name, email, password, gender,interest } = req.body;
+    const { name, email, password, gender, interest } = req.body;
 
     if ((name && email && password && gender) === undefined) {
       return res
@@ -24,18 +24,19 @@ export const signUp = async (req, res) => {
         .status(409)
         .json({ success: false, message: error.userAlreadyExicts });
     }
-    const hashedPassword = await bcrypt.hash(password, 10); 
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const {secure_url}=await fileUpload(req.file?.path)
-    
+    const {secure_url,public_id} = await fileUpload(req.file?.path);
+
     await prisma.user.create({
       data: {
         name,
         email,
-        password:hashedPassword,
+        password: hashedPassword,
         gender,
         interest,
-        profilePic:secure_url
+        profilePic: secure_url,
+        publicUrl: public_id,
       },
     });
 
@@ -70,7 +71,7 @@ export const signUp = async (req, res) => {
 `;
     const mailOptions = {
       to: email,
-      subject:'Sign-Up Successfully',
+      subject: "Sign-Up Successfully",
       html: emailTemp,
     };
     await sendEmail(mailOptions);
@@ -120,16 +121,17 @@ export const profile = async (req, res) => {
   }
 };
 
-export const remove = async(req,res)=>{
+export const remove = async (req, res) => {
   try {
-    const {id}=req.user;
+    const { id, publicUrl } = req.user;
     await prisma.user.delete({
-      where:{
-        id
-      }
-    })
-    return res.status(200).json({success:true,data:"Delete Successfully"})
+      where: {
+        id,
+      },
+    });
+    await fileDestroy(publicUrl);
+    return res.status(200).json({ success: true, data: "Delete Successfully" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-}
+};

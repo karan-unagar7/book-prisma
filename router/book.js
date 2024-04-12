@@ -1,11 +1,15 @@
 import { Router } from "express";
-import { add,getAll,getOne,update,remove } from "../controller/book.controller.js";
+import { add,bookList,getUserAllBook,getUserOneBook,update,remove } from "../controller/book.controller.js";
+import { verifyUser } from "../middleware/auth.js";
 
 const router = Router();
 
+router.get('/list', bookList);
+
+router.use(verifyUser);
 router.post('/add', add);
-router.get('/getall', getAll);
-router.get('/getone/:id', getOne);
+router.get('/getall', getUserAllBook);
+router.get('/getone/:id', getUserOneBook);
 router.put('/update/:id', update);
 router.delete('/delete/:id', remove);
 

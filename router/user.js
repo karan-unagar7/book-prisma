@@ -7,7 +7,9 @@ const router = Router();
 
 router.post("/signup",upload.single('profilePic'), signUp);
 router.post("/signin", signIn);
-router.get("/profile", verifyUser, profile);
-router.delete('/delete' , verifyUser,remove)
+
+router.use(verifyUser)
+router.get("/profile", profile);
+router.delete('/delete',remove);
 
 export default router;
