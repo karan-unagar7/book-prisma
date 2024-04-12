@@ -116,7 +116,7 @@ export const update = async (req, res) => {
   }
 };
 
-export const deletee = async (req, res) => {
+export const remove = async (req, res) => {
   try {
     const { id } = req.user;
     const _id = Number(req.params.id);

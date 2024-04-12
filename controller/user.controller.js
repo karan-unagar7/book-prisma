@@ -111,7 +111,7 @@ export const signIn = async (req, res) => {
   }
 };
 
-export const getUser = async (req, res) => {
+export const profile = async (req, res) => {
   try {
     const user = req.user;
     return res.status(200).json({ success: true, data: user });
@@ -120,7 +120,7 @@ export const getUser = async (req, res) => {
   }
 };
 
-export const deleteUser = async(req,res)=>{
+export const remove = async(req,res)=>{
   try {
     const {id}=req.user;
     await prisma.user.delete({
